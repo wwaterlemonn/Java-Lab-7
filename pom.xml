@@ -88,12 +88,17 @@
         <version>1.5.18</version>
         <scope>compile</scope>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-core -->
+    <!-- https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-core -->
     <dependency>
-        <groupId>org.hibernate</groupId>
+        <groupId>org.hibernate.orm</groupId>
         <artifactId>hibernate-core</artifactId>
         <version>7.0.0.Final</version>
-        <type>pom</type>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
+    <dependency>
+        <groupId>org.postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>42.7.6</version>
     </dependency>
   </dependencies>
 

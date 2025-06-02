@@ -1,4 +1,4 @@
-package wlmn.command;
+package wlmn.server;
 
 import java.io.Serializable;
 

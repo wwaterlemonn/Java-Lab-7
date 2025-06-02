@@ -5,10 +5,23 @@ import java.io.Serializable;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
 /**
  * Класс, представляющий координаты на плоскости.
  */
+@Entity
 public class Coordinates implements Serializable, Comparable<Coordinates>{
+    /**
+     * Идентификатор для хранения в таблице.
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private int id;
+    
     /**
      * Координата X.
      * Значение должно быть > -240.
@@ -21,6 +34,11 @@ public class Coordinates implements Serializable, Comparable<Coordinates>{
      */
     private Double y;
 
+
+    public Coordinates(){
+
+    }
+    
     /**
      * Конструктор для создания объекта Coordinates. Используется для сериализации в JSON.
 

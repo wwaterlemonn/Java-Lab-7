@@ -5,6 +5,16 @@ import java.time.ZonedDateTime;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import wlmn.location.Coordinates;
 import wlmn.myenum.Color;
 
@@ -13,12 +23,15 @@ import wlmn.myenum.Color;
  * Содержит информацию о характеристиках дракона и его убийце (если есть).
  * Реализует интерфейс Comparable для сравнения драконов.
  */
+@Entity
 public class Dragon implements Comparable<Dragon>, Serializable{
 
     /**
      * Уникальный идентификатор дракона.
      * Не может быть null, должен быть > 0, генерируется автоматически.
      */
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     /**
@@ -31,6 +44,8 @@ public class Dragon implements Comparable<Dragon>, Serializable{
      * Координаты расположения дракона.
      * Не может быть null.
      */
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "coordinates_id", referencedColumnName = "id")
     private Coordinates coordinates;
 
     /**
@@ -60,13 +75,20 @@ public class Dragon implements Comparable<Dragon>, Serializable{
      * Цвет дракона.
      * Может быть null.
      */
+    @Enumerated(EnumType.STRING)
     private Color color;
 
     /**
      * Убийца дракона (если есть).
      * Может быть null.
      */
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "killer_id", referencedColumnName = "id")
     private Person killer;
+
+    public Dragon(){
+
+    }
 
     /**
      * Конструктор для десериализации из JSON.
@@ -105,7 +127,7 @@ public class Dragon implements Comparable<Dragon>, Serializable{
 
     /**
      * Основной конструктор для создания нового дракона.
-     * Автоматически генерирует ID и дату создания.
+     * Автоматически генерирует дату создания.
      * 
      * @param name имя дракона
      * @param coordinates координаты
@@ -117,7 +139,7 @@ public class Dragon implements Comparable<Dragon>, Serializable{
      */
     public Dragon(String name, Coordinates coordinates,int age,
     Double weight, boolean speaking, Color color,Person killer) {  
-        this.id = 1L;
+        //this.id = 1L;
         this.name = name;
         this.coordinates = coordinates;
         this.creationDate = ZonedDateTime.now();
@@ -215,4 +237,12 @@ public class Dragon implements Comparable<Dragon>, Serializable{
     public ZonedDateTime getCreationDate() {
         return creationDate;
     }
+
+    @Override
+    public String toString() {
+        return "Dragon [id=" + id + ", name=" + name + ", coordinates=" + coordinates + ", creationDate=" + creationDate
+                + ", age=" + age + ", weight=" + weight + ", speaking=" + speaking + ", color=" + color + ", killer="
+                + killer + "]";
+    }
+    
 }

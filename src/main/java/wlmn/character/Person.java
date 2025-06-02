@@ -6,6 +6,15 @@ import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import wlmn.location.Location;
 import wlmn.myenum.Color;
 import wlmn.myenum.Country;
@@ -15,7 +24,12 @@ import wlmn.myenum.Country;
  * Содержит информацию о характеристиках человека.
  * Реализует интерфейс Comparable для сравнения людей по имени.
  */
+@Entity
 public class Person implements Comparable<Person>, Serializable{
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private long id;
+
     /**
      * Имя человека.
      * Не может быть null или пустой строкой.
@@ -44,6 +58,8 @@ public class Person implements Comparable<Person>, Serializable{
      * Местоположение человека.
      * Не может быть null.
      */
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "location_id", referencedColumnName = "id")
     private Location location;
 
     /**
@@ -60,9 +76,9 @@ public class Person implements Comparable<Person>, Serializable{
     public Person(@JsonProperty("name") String name, @JsonProperty("birthday") LocalDateTime birthday,
     @JsonProperty("hairColor") Color hairColor, @JsonProperty("nationality") Country nationality,
     @JsonProperty("location") Location location) throws Exception{
-        if (name == null | name == "" | nationality == null | location == null){
-            throw new Exception();
-        }
+        // if (name == null | name == "" | nationality == null | location == null){
+        //     throw new Exception();
+        // }
         this.name = name;
         this.birthday = birthday;
         this.hairColor = hairColor;
@@ -100,6 +116,7 @@ public class Person implements Comparable<Person>, Serializable{
      * Возвращает цвет волос человека.
      * @return цвет волос (может быть null)
      */
+    @Enumerated(EnumType.STRING)
     public Color getHairColor() {
         return hairColor;
     }
@@ -108,6 +125,7 @@ public class Person implements Comparable<Person>, Serializable{
      * Возвращает национальность человека.
      * @return национальность (не null)
      */
+    @Enumerated(EnumType.STRING)
     public Country getNationality() {
         return nationality;
     }
