@@ -1,8 +1,10 @@
 package wlmn.dbeditor;
 
-import java.util.LinkedList;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+
+import org.hibernate.Session;
+import org.hibernate.exception.ConstraintViolationException;
 
 import wlmn.character.Dragon;
 
@@ -13,7 +15,7 @@ import wlmn.character.Dragon;
 public class CollectionManager {
     private static TreeMap<String, Dragon> collection;
     private static String collectionFileName;
-    private static LinkedList<Long> id_taken = new LinkedList<Long>();
+    private static Session session = HibernateUtil.getSessionFactory().openSession();
 
     /**
      * Загружает коллекцию драконов из JSON-файла.
@@ -22,31 +24,59 @@ public class CollectionManager {
      * @param filename путь к JSON-файлу с данными о коллекции
      * @see FileEditor#jsonToDragon(String)
      */
-    public static void loadCollection(String filename){
+    public static void loadCollection(){
         if (collection != null) collection.clear();
-        collectionFileName = filename;
-        collection = FileEditor.jsonToDragon(collectionFileName);
-        id_taken = collection.entrySet()
-            .stream()
-            .map(item -> item.getValue().getId())
-            .distinct().collect(Collectors.toCollection(LinkedList::new));
+        collection = session.createSelectionQuery("FROM Dragon", Dragon.class).getResultList().stream()
+            .collect(Collectors.toMap(Dragon::getKey, item -> item, (e1, e2) -> e1, TreeMap::new));
         System.out.println("Коллекция загружена из файла " + collectionFileName);
     }
     
     /**
-     * Добавляет новый элемент в коллекцию. Также используется для замены уже существующего элемента по ключу.
+     * Добавляет новый элемент в коллекцию с заданным ключом, при условии что элемента с таким ключом
+     * еще не существует в таблице.
      *
      * @param key ключ, по которому будет сохранён дракон
      * @param dragon объект дракона для добавления
      */
     public static void addElement(String key, Dragon dragon){
-        if (id_taken.isEmpty()){
-            dragon.setId(1L);
+        try{
+            session.beginTransaction();
+            dragon.setKey(key);
+            session.persist(dragon);
+            session.getTransaction().commit();
+            collection.putIfAbsent(key, dragon);
         }
-        else{
-            dragon.setId(id_taken.get(id_taken.size()-1)+1);
+        catch(ConstraintViolationException e){
+            System.out.println(e.getClass() + ": " + e.getMessage());
+            if (session.getTransaction() != null) {
+                session.getTransaction().rollback();
+            }
         }
-        collection.put(key, dragon);
+    }
+
+    /**
+     * Обновляет элемент коллекции с заданным ключом, при условии что элемент с таким ключом
+     * существует в таблице.
+     *
+     * @param key ключ, по которому будет сохранён дракон
+     * @param dragon новый объект дракона для обновления
+     */
+    public static void updateElement(long id, Dragon dragon){
+        try{
+            session.beginTransaction();
+            Dragon oldDragon = session.find(Dragon.class, id);
+            dragon.setKey(oldDragon.getKey());
+            dragon.setId(id);
+            session.merge(dragon);
+            session.getTransaction().commit();
+            collection.replace(dragon.getKey(), dragon);
+        }
+        catch(NullPointerException e){
+            System.out.println(e.getClass() + ": " + e.getMessage());
+            if (session.getTransaction() != null) {
+                session.getTransaction().rollback();
+            }
+        }
     }
 
     /**
@@ -55,8 +85,21 @@ public class CollectionManager {
      * @param key ключ элемента, который нужно удалить
      * @return удалённый объект {@link Dragon} или {@code null}, если ключ не найден
      */
-    public static Dragon removeElement(String key){
-        return (collection.remove(key));
+    public static Dragon removeElement(Long id){
+        try{
+            session.beginTransaction();
+            Dragon dragon = session.find(Dragon.class, id);
+            session.remove(dragon);
+            session.getTransaction().commit();
+            return collection.remove(dragon.getKey());
+        }
+        catch(IllegalArgumentException e){
+            System.out.println(e.getClass() + ": " + e.getMessage());
+            if (session.getTransaction() != null) {
+                session.getTransaction().rollback();
+            }
+            return null;
+        }
     }
 
     /**
@@ -82,5 +125,12 @@ public class CollectionManager {
      */
     public static String getCollectionFileName() {
         return collectionFileName;
+    }
+
+    /**
+     * Закрывает сессию работы с базой данных. Следует вызывать при завершении работы приложения.
+     */
+    public static void closeSession(){
+        session.close();
     }
 }

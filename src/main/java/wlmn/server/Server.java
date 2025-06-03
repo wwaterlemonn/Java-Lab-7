@@ -12,11 +12,6 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -164,30 +159,28 @@ public class Server {
     }
 
     public static void main(String args[]) throws Exception{
-        // try{
-        //     if (args.length != 1){
-        //         CollectionManager.loadCollection(null);
-        //     }
-        //     else{
-        //         CollectionManager.loadCollection(args[0]);
-        //     }
-        // }
-        // catch (Exception e){
-        //     System.out.println("Завершение работы программы.");
-        //     logger.error("Завершение работы программы.");
-        //     System.exit(-1);
-        // }
+        try{
+            CollectionManager.loadCollection();
+        }
+        catch (Exception e){
+            System.out.println("Завершение работы программы.");
+            logger.error("Завершение работы программы.");
+            System.exit(-1);
+        }
 
         try (Session session = HibernateUtil.getSessionFactory().openSession()){
-            session.beginTransaction();
+            // session.beginTransaction();
             Location location = new Location(1L, 2L, 3D);
             Coordinates coordinates = new Coordinates(1L, 2D);
             Person killer = new Person("vasya", null, Color.BROWN, Country.RUSSIA, location);
-            Dragon dragon = new Dragon("test3", coordinates, 12, 34D, true, Color.RED, killer);
-            System.out.println(dragon.toString());
-            session.persist(dragon);
-            session.getTransaction().commit();
+            Dragon dragon = new Dragon("testupdate2", coordinates, 12, 34D, true, Color.RED, killer);
+            // System.out.println(dragon.toString());
+            // session.persist(dragon);
+            // session.getTransaction().commit();
+            CollectionManager.removeElement(702L);
         }
+
+        System.out.println(CommandInvoker.executeCommand(new Request("show", null)));
 
         int port = 64494;
         Server server = new Server(port);

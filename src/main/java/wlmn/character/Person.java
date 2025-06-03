@@ -62,6 +62,10 @@ public class Person implements Comparable<Person>, Serializable{
     @JoinColumn(name = "location_id", referencedColumnName = "id")
     private Location location;
 
+    public Person(){
+        
+    }
+
     /**
      * Конструктор для создания объекта Person. Также используется для сериализации в JSON.
      * 

@@ -1,6 +1,5 @@
 <hibernate-configuration>
     <session-factory>
-        <!-- <mapping class = "wlmn.location.Location"/> -->
         <mapping class = "wlmn.character.Dragon"/>
         <mapping class = "wlmn.character.Person"/>
         <mapping class = "wlmn.location.Location"/>

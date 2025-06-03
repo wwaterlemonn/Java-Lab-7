@@ -16,7 +16,7 @@ public class RemoveKey implements Command{
     }
 
     public String execute() {
-        if (CollectionManager.removeElement(key) != null){
+        if (CollectionManager.removeElement(CollectionManager.getCollection().get(key).getId()) != null){
             return ("Успешно удален элемент с ключом " + key + ".");
         }
         else{

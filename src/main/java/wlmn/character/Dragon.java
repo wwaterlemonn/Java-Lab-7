@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -14,7 +15,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import wlmn.location.Coordinates;
 import wlmn.myenum.Color;
 
@@ -32,7 +32,13 @@ public class Dragon implements Comparable<Dragon>, Serializable{
      */
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
+    private Long id = null;
+
+    /**
+     * Уникальный ключ элемента в таблице.
+     */
+    @Column(unique = true)
+    private String key = null;
 
     /**
      * Имя дракона.
@@ -139,7 +145,6 @@ public class Dragon implements Comparable<Dragon>, Serializable{
      */
     public Dragon(String name, Coordinates coordinates,int age,
     Double weight, boolean speaking, Color color,Person killer) {  
-        //this.id = 1L;
         this.name = name;
         this.coordinates = coordinates;
         this.creationDate = ZonedDateTime.now();
@@ -152,7 +157,7 @@ public class Dragon implements Comparable<Dragon>, Serializable{
 
     /**
      * Сравнивает текущего дракона с другим.
-     * Сравнение производится по ID, возрасту и весу.
+     * Сравнение производится по местоположению.
      * 
      * @param dragon2 дракон для сравнения
      * @return 1 если текущий дракон "больше", -1 если "меньше", 0 если равны
@@ -226,8 +231,14 @@ public class Dragon implements Comparable<Dragon>, Serializable{
         return id;
     }
 
-    public void setId(long id){
-        this.id = id;
+    /**
+     * Впервые устанавливает значение id.
+     * @param id
+     */
+    public void setId(Long id){
+        if (this.id == null && id != null){
+            this.id = id;
+        }
     }
 
     /**
@@ -236,6 +247,24 @@ public class Dragon implements Comparable<Dragon>, Serializable{
      */
     public ZonedDateTime getCreationDate() {
         return creationDate;
+    }
+
+    /**
+     * Возвращает уникальный ключ дракона.
+     * @return ключ дракона
+     */
+    public String getKey() {
+        return key;
+    }
+
+    /**
+     * Впервые устанавливает значение ключа.
+     * @param key
+     */
+    public void setKey(String key) {
+        if (this.key == null && key != null){
+            this.key = key;
+        }
     }
 
     @Override

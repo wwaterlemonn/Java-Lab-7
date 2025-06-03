@@ -23,7 +23,7 @@ public class RemoveGreaterKey implements Command{
         CollectionManager.getCollection().keySet()
             .stream()
             .filter(item -> (item.compareTo(key) == 1))
-            .forEach(item -> CollectionManager.removeElement(item));
+            .forEach(item -> CollectionManager.removeElement(CollectionManager.getCollection().get(item).getId()));
         return ("Успешно удалены "+counter+" элементов.");
     }
 
