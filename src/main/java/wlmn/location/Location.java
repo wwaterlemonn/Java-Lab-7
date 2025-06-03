@@ -5,23 +5,13 @@ import java.io.Serializable;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.Embeddable;
 
 /**
  * Класс, представляющий трехмерные координаты в пространстве.
  */
-@Entity
+@Embeddable
 public class Location implements Serializable{
-    /**
-     * Идентификатор для хранения в таблице.
-     */
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private int id;
-    
     /**
      * Координата X.
      * Не может быть null.

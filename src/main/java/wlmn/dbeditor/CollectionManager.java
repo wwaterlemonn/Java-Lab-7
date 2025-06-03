@@ -28,7 +28,7 @@ public class CollectionManager {
         if (collection != null) collection.clear();
         collection = session.createSelectionQuery("FROM Dragon", Dragon.class).getResultList().stream()
             .collect(Collectors.toMap(Dragon::getKey, item -> item, (e1, e2) -> e1, TreeMap::new));
-        System.out.println("Коллекция загружена из файла " + collectionFileName);
+        System.out.println("Коллекция загружена из базы данных.");
     }
     
     /**

@@ -12,14 +12,12 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import wlmn.character.Dragon;
 import wlmn.character.Person;
 import wlmn.dbeditor.CollectionManager;
-import wlmn.dbeditor.HibernateUtil;
 import wlmn.location.Coordinates;
 import wlmn.location.Location;
 import wlmn.myenum.Color;
@@ -163,22 +161,16 @@ public class Server {
             CollectionManager.loadCollection();
         }
         catch (Exception e){
-            System.out.println("Завершение работы программы.");
-            logger.error("Завершение работы программы.");
+            System.out.println("Произошла ошибка при загрузке коллекции из базы данных. Завершение работы программы.");
+            logger.error("Произошла ошибка при загрузке коллекции из базы данных. Завершение работы программы.");
             System.exit(-1);
         }
 
-        try (Session session = HibernateUtil.getSessionFactory().openSession()){
-            // session.beginTransaction();
-            Location location = new Location(1L, 2L, 3D);
-            Coordinates coordinates = new Coordinates(1L, 2D);
-            Person killer = new Person("vasya", null, Color.BROWN, Country.RUSSIA, location);
-            Dragon dragon = new Dragon("testupdate2", coordinates, 12, 34D, true, Color.RED, killer);
-            // System.out.println(dragon.toString());
-            // session.persist(dragon);
-            // session.getTransaction().commit();
-            CollectionManager.removeElement(702L);
-        }
+        Location location = new Location(1L, 2L, 3D);
+        Coordinates coordinates = new Coordinates(1L, 2D);
+        Person killer = new Person("vasya", null, Color.BROWN, Country.RUSSIA, location);
+        Dragon dragon = new Dragon("testupdate2", coordinates, 12, 34D, true, Color.RED, killer);
+        CollectionManager.addElement("testwithEmbed", dragon);
 
         System.out.println(CommandInvoker.executeCommand(new Request("show", null)));
 

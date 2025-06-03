@@ -2,19 +2,20 @@ package wlmn.character;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;
+
+import org.hibernate.annotations.EmbeddedColumnNaming;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import wlmn.location.Coordinates;
 import wlmn.myenum.Color;
 
@@ -50,8 +51,8 @@ public class Dragon implements Comparable<Dragon>, Serializable{
      * Координаты расположения дракона.
      * Не может быть null.
      */
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "coordinates_id", referencedColumnName = "id")
+    @Embedded
+    @EmbeddedColumnNaming("%s")
     private Coordinates coordinates;
 
     /**
@@ -88,8 +89,8 @@ public class Dragon implements Comparable<Dragon>, Serializable{
      * Убийца дракона (если есть).
      * Может быть null.
      */
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "killer_id", referencedColumnName = "id")
+    @Embedded
+    @EmbeddedColumnNaming("killer_%s")
     private Person killer;
 
     public Dragon(){
