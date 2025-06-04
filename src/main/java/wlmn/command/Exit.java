@@ -1,8 +1,5 @@
 package wlmn.command;
 
-import wlmn.server.CommandInvoker;
-import wlmn.server.Request;
-
 /**
  * Команда, завершающая работу программы.
  */
@@ -12,7 +9,8 @@ public class Exit implements Command{
     }
     
     public String execute(){
-        return CommandInvoker.executeCommand(new Request("save", null));
+        //return CommandInvoker.executeCommand(new Request("save", null));
+        return ("Клиент завершил работу приложения.");
     }
 
     public static String getMessage(){

@@ -16,6 +16,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Transient;
 import wlmn.location.Coordinates;
 import wlmn.myenum.Color;
 
@@ -26,6 +27,8 @@ import wlmn.myenum.Color;
  */
 @Entity
 public class Dragon implements Comparable<Dragon>, Serializable{
+    @Transient
+    private static final long serialVersionUID = 1L;
 
     /**
      * Уникальный идентификатор дракона.

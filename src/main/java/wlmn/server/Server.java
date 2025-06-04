@@ -3,6 +3,7 @@ package wlmn.server;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
@@ -17,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import wlmn.character.Dragon;
 import wlmn.character.Person;
+import wlmn.command.Request;
 import wlmn.dbeditor.CollectionManager;
 import wlmn.location.Coordinates;
 import wlmn.location.Location;
@@ -54,7 +56,10 @@ public class Server {
                 }
                 selector.selectedKeys().clear();
             }
-        } catch (IOException e){
+        } catch(InvalidClassException e){
+            System.out.println("Ошибка: Версия класса, полученного от клиента, не совпадает с версией на сервере. " + e.getMessage());
+            logger.error("Ошибка: Версия класса, полученного от клиента, не совпадает с версией на сервере.");
+        } catch(IOException e){
             //throw new RuntimeException(e.getMessage());
             e.printStackTrace();
         }
@@ -173,6 +178,7 @@ public class Server {
         CollectionManager.addElement("testwithEmbed", dragon);
 
         System.out.println(CommandInvoker.executeCommand(new Request("show", null)));
+        System.out.println(killer.compareTo(null));
 
         int port = 64494;
         Server server = new Server(port);

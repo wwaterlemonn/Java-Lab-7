@@ -86,12 +86,15 @@ public class Person implements Comparable<Person>, Serializable{
     }
 
     /**
-     * Сравнивает текущего человека с другим по имени.
+     * Сравнивает текущего человека с другим по имени. При сравнении с {@code null} возвращает 1.
      * 
      * @param person2 человек для сравнения
      * @return результат сравнения имен (как String.compareTo)
      */
     public int compareTo(Person person2){
+        if (person2 == null){
+            return 1;
+        }
         return this.name.compareTo(person2.name);
     }
 

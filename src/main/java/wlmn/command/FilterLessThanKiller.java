@@ -26,7 +26,7 @@ public class FilterLessThanKiller implements Command{
         TreeMap<String, Dragon> strippedCollection = CollectionManager.getCollection();
         strippedCollection = strippedCollection.entrySet()
             .stream()
-            .filter(entry -> (entry.getValue().getKiller().compareTo(killer) == 1))
+            .filter(entry -> (killer.compareTo(entry.getValue().getKiller()) == 1))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, TreeMap::new));
         return (FileEditor.dragonToJson(strippedCollection));
     }

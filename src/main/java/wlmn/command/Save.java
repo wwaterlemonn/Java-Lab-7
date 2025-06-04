@@ -1,21 +1,18 @@
 package wlmn.command;
 
-import wlmn.dbeditor.CollectionManager;
-import wlmn.dbeditor.FileEditor;
-
 /**
  * Команда, сохраняющая изменненную коллекцию в файл.
  */
 public class Save implements Command {
-    private static String filename = CollectionManager.getCollectionFileName();
+    //private static String filename = CollectionManager.getCollectionFileName();
 
     public Save(){
 
     }
 
     public String execute() {
-        FileEditor.stringToFile(FileEditor.dragonToJson(CollectionManager.getCollection()), filename);
-        return ("Коллекция успешно сохранена в рабочий файл.");
+        // FileEditor.stringToFile(FileEditor.dragonToJson(CollectionManager.getCollection()), filename);
+        return ("");
     }
 
     public static String getMessage(){
