@@ -13,12 +13,16 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.security.NoSuchAlgorithmException;
+import java.util.LinkedHashMap;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import wlmn.character.Dragon;
 import wlmn.character.Person;
 import wlmn.command.Request;
+import wlmn.dbeditor.AuthManager;
 import wlmn.dbeditor.CollectionManager;
 import wlmn.location.Coordinates;
 import wlmn.location.Location;
@@ -28,13 +32,13 @@ import wlmn.myenum.Country;
 public class Server {
     final int PORT;
     private static final Logger logger = LoggerFactory.getLogger(Server.class);
+    private LinkedHashMap<SocketChannel, String> authClients = new LinkedHashMap<SocketChannel, String>();
 
     public Server(int PORT) {
         this.PORT = PORT;
     }
 
     public void start() {
-        
         try (ServerSocketChannel channel = ServerSocketChannel.open();
             Selector selector = Selector.open()){
             channel.configureBlocking(false);
@@ -84,6 +88,7 @@ public class Server {
             System.out.println("Получено сообщение по неизвестному каналу.");
             return;
         }
+
         buffer.clear();
         int bytesRead = -1;
         try {
@@ -100,6 +105,7 @@ public class Server {
             client.close();
             return;
         }
+
         buffer.flip();
         Request command = null;
         try (ByteArrayInputStream bais = new ByteArrayInputStream(buffer.array());
@@ -113,8 +119,28 @@ public class Server {
         System.out.println("|R| Получен запрос на выполнение команды /" + command.getKey() + " от клиента (" + client.getRemoteAddress() + ").");
         logger.info("|R| Получен запрос на выполнение команды /" + command.getKey() + " от клиента (" + client.getRemoteAddress() + ").");
         buffer.clear();
+
+        String message = null;
+        if (command.getKey().equals("register_account") || command.getKey().equals("login_account")){
+            if (authClients.containsKey(client)){
+                message = "[X] Ошибка: вход в аккаунт уже выполнен на этом клиенте.";
+            }
+            else {
+                message = CommandInvoker.executeCommand(command);
+                if (message.startsWith("[:^)]")){
+                    authClients.putIfAbsent(client, (String) command.getArgs()[0]);
+                }
+            }
+        }
+        else if (authClients.containsKey(client)){
+            message = CommandInvoker.executeCommand(command);
+        }
+        else{
+            message = "Ошибка: не выполнен вход в аккаунт. Исполнение команд запрещено.";
+        }
+
         String response = "Результат выполнения команды /"+ command.getKey() + ", запрошенной клиентом ("
-        + client.getRemoteAddress() + "): \n-----\n" + CommandInvoker.executeCommand(command) + "\n-----";
+        + client.getRemoteAddress() + "): \n-----\n" + message + "\n-----";
         logger.info(response);
         System.out.println(response);
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -164,6 +190,12 @@ public class Server {
     public static void main(String args[]) throws Exception{
         try{
             CollectionManager.loadCollection();
+            AuthManager.initMD("SHA-512");
+        }
+        catch (NoSuchAlgorithmException e){
+            System.out.println("Критическое нарушение безопасности: указан некорректный алгоритм хэширования паролей. Завершение работы программы.");
+            logger.error("Критическое нарушение безопасности: указан некорректный алгоритм хэширования паролей. Завершение работы программы.");
+            System.exit(-1);
         }
         catch (Exception e){
             System.out.println("Произошла ошибка при загрузке коллекции из базы данных. Завершение работы программы.");

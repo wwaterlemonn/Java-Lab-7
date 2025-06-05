@@ -1,7 +1,5 @@
 package wlmn.command;
 
-import java.util.Map;
-
 import wlmn.character.Dragon;
 import wlmn.dbeditor.CollectionManager;
 
@@ -23,13 +21,7 @@ public class Update implements Command{
     }
 
     public String execute(){
-        for (Map.Entry<String, Dragon> x: CollectionManager.getCollection().entrySet()){
-            String key = x.getKey();
-            Dragon value = x.getValue();
-            if (id == value.getId()){
-                CollectionManager.addElement(key, newDragon);
-            }
-        }
+        CollectionManager.updateElement(id, newDragon);
         return ("Значение элемента коллекции с id = " + id + " успешно обновлено.");
     }
 

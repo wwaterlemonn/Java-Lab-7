@@ -45,6 +45,12 @@ public class Dragon implements Comparable<Dragon>, Serializable{
     private String key = null;
 
     /**
+     * Логин владельца элемента коллекции.
+     */
+    @Column(unique = true)
+    private String ownerLogin = null;
+
+    /**
      * Имя дракона.
      * Не может быть null или пустой строкой.
      */
@@ -268,6 +274,24 @@ public class Dragon implements Comparable<Dragon>, Serializable{
     public void setKey(String key) {
         if (this.key == null && key != null){
             this.key = key;
+        }
+    }
+
+    /**
+     * Возвращает логин владельца элемента.
+     * @return ключ дракона
+     */
+    public String getOwnerLogin() {
+        return ownerLogin;
+    }
+
+    /**
+     * Впервые устанавливает значение логина владельца.
+     * @param key
+     */
+    public void setOwnerLogin(String login) {
+        if (this.ownerLogin == null && login != null){
+            this.ownerLogin = login;
         }
     }
 

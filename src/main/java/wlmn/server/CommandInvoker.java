@@ -25,6 +25,8 @@ public class CommandInvoker {
      */
     private static HashMap<String, Class<?>> initCommandClasses(){
         HashMap<String, Class<?>> map = new HashMap<String, Class<?>>();
+        map.put("register_account", RegisterAccount.class);
+        map.put("login_account", LoginAccount.class);
         map.put("help", Help.class);
         map.put("exit", Exit.class);
         map.put("show", Show.class);
@@ -50,6 +52,8 @@ public class CommandInvoker {
      */
     private static HashMap<String, Class<?>[]> initCommandSignatures(){
         HashMap<String, Class<?>[]> map = new HashMap<String, Class<?>[]>();
+        map.put("register_account", new Class<?>[]{String.class, String.class});
+        map.put("login_account", new Class<?>[]{String.class, String.class});
         map.put("help", new Class<?>[]{String.class});
         map.put("exit", new Class<?>[]{});
         map.put("show", new Class<?>[]{});
