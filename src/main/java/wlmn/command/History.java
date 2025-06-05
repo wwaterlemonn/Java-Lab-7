@@ -7,7 +7,7 @@ import wlmn.server.CommandInvoker;
 /**
  * Команда, выводящая последние 13 использованных команд в консоль.
  */
-public class History implements Command{
+public class History extends Command{
     public History(){
 
     }

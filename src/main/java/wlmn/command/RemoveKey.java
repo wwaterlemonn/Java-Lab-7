@@ -5,7 +5,7 @@ import wlmn.dbeditor.CollectionManager;
 /**
  * Команда, удаляющая элемент коллекции с заданным ключом.
  */
-public class RemoveKey implements Command{
+public class RemoveKey extends ModificationCommand{
     private String key;
 
     /**
@@ -16,7 +16,7 @@ public class RemoveKey implements Command{
     }
 
     public String execute() {
-        if (CollectionManager.removeElement(CollectionManager.getCollection().get(key).getId()) != null){
+        if (CollectionManager.removeElement(login, CollectionManager.getCollection().get(key).getId()) != null){
             return ("Успешно удален элемент с ключом " + key + ".");
         }
         else{

@@ -9,7 +9,7 @@ import wlmn.dbeditor.CollectionManager;
 /**
  * Команда, выводящая в консоль все уникальные значения поля age среди элементов коллекции.
  */
-public class PrintUniqueAge implements Command {
+public class PrintUniqueAge extends Command {
     public PrintUniqueAge(){
 
     }

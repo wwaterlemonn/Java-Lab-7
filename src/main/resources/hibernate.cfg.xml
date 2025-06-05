@@ -4,5 +4,6 @@
         <mapping class = "wlmn.character.Person"/>
         <mapping class = "wlmn.location.Location"/>
         <mapping class = "wlmn.location.Coordinates"/>
+        <mapping class = "wlmn.dbeditor.UserAccount"/>
     </session-factory>
 </hibernate-configuration>

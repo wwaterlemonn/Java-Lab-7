@@ -6,7 +6,7 @@ import wlmn.dbeditor.CollectionManager;
 /**
  * Команда, добавляющая указанный элемент в коллекцию по указанному ключу.
  */
-public class Insert implements Command{
+public class Insert extends ModificationCommand{
     private String key;
     private Dragon dragon;
 
@@ -20,8 +20,7 @@ public class Insert implements Command{
     }
 
     public String execute() {
-        CollectionManager.addElement(key, dragon);
-        return ("В коллекцию успешно добавлен элемент с ключом " + key + ".");
+        return (CollectionManager.insertElement(login, key, dragon));
     }
 
     public static String getMessage(){

@@ -14,7 +14,7 @@ import wlmn.dbeditor.CollectionManager;
  * Команда, выводящая общую информацию о коллекции: тип элементов, кол-во элементов, даты создания,
  * последнего открытия и последнего изменения.
  */
-public class Info implements Command{
+public class Info extends Command{
     private static String filename = CollectionManager.getCollectionFileName();
 
     public Info(){

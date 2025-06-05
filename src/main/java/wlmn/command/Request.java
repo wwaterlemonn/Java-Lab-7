@@ -3,6 +3,8 @@ package wlmn.command;
 import java.io.Serializable;
 
 public class Request implements Serializable{
+    //private String login;
+    //private String password;
     private String key;
     private Object[] args;
 
@@ -18,4 +20,12 @@ public class Request implements Serializable{
     public Object[] getArgs() {
         return args;
     }
+
+    // public String getLogin() {
+    //     return login;
+    // }
+
+    // public String getPassword() {
+    //     return password;
+    // }
 }

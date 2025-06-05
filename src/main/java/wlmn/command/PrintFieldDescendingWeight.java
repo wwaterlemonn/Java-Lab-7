@@ -11,7 +11,7 @@ import wlmn.dbeditor.CollectionManager;
 /**
  * Команда, выводящая в консоль поле weight всех элементов коллекции в порядке убывания.
  */
-public class PrintFieldDescendingWeight implements Command{
+public class PrintFieldDescendingWeight extends Command{
     public PrintFieldDescendingWeight(){
 
     }

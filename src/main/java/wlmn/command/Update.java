@@ -6,7 +6,7 @@ import wlmn.dbeditor.CollectionManager;
 /**
  * Команда, заменяющая элемент коллекции с указанным id на новый указанный элемент.
  */
-public class Update implements Command{
+public class Update extends ModificationCommand{
     private Long id;
     private Dragon newDragon;
 
@@ -21,8 +21,7 @@ public class Update implements Command{
     }
 
     public String execute(){
-        CollectionManager.updateElement(id, newDragon);
-        return ("Значение элемента коллекции с id = " + id + " успешно обновлено.");
+        return (CollectionManager.updateElement(login, id, newDragon));
     }
 
     public static String getMessage(){

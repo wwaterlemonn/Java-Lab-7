@@ -47,7 +47,7 @@ public class Dragon implements Comparable<Dragon>, Serializable{
     /**
      * Логин владельца элемента коллекции.
      */
-    @Column(unique = true)
+    @Column(name = "owner_login")
     private String ownerLogin = null;
 
     /**

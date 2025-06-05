@@ -11,7 +11,7 @@ import java.lang.reflect.*;
  * Команда, выводящая в консоль подробную информацию о различных доступных командах:
  *  их предназначение и правила ввода.
  */
-public class Help implements Command{
+public class Help extends Command{
     private static HashMap<String, String> messages = initMessages();
     private String key;
 

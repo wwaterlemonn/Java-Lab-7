@@ -3,7 +3,7 @@ package wlmn.command;
 /**
  * Команда, завершающая работу программы.
  */
-public class Exit implements Command{
+public class Exit extends Command{
     public Exit(){
 
     }

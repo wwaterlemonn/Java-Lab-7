@@ -6,7 +6,7 @@ import wlmn.dbeditor.CollectionManager;
 /**
  * Команда, заменяющая элемент коллекции с указанным ключом на указанный новый элемент, если его значение превышает старое.
  */
-public class ReplaceIfGreater implements Command{
+public class ReplaceIfGreater extends ModificationCommand{
     private String key;
     private Dragon dragonNew;
 
@@ -24,8 +24,8 @@ public class ReplaceIfGreater implements Command{
         if (dragonOld == null){
             return ("Ошибка: элемента с таким ключом не существует.");
         }
-        else if (dragonNew.compareTo(CollectionManager.getCollection().get(key)) == 1){
-            CollectionManager.addElement(key, dragonNew);
+        else if (dragonNew.compareTo(CollectionManager.getCollection().get(key)) > 0){
+            CollectionManager.updateElement(login, dragonOld.getId(), dragonNew);
             return ("Значение в коллекции с ключом "+ key + " успешно заменено на новое.");
         }
         else{

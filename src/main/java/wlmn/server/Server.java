@@ -96,12 +96,14 @@ public class Server {
         } catch (SocketException e) {
             System.out.println("|X| Разорвано соединение с клиентом (" + client.getRemoteAddress() + ").");
             logger.warn("|X| Разорвано соединение с клиентом (" + client.getRemoteAddress() + ").");
+            authClients.remove(client);
             client.close();
             return;
         }
         if (bytesRead == -1){
             System.out.println("|X| Разорвано соединение с клиентом (" + client.getRemoteAddress() + ").");
             logger.warn("|X| Разорвано соединение с клиентом (" + client.getRemoteAddress() + ").");
+            authClients.remove(client);
             client.close();
             return;
         }
@@ -121,19 +123,20 @@ public class Server {
         buffer.clear();
 
         String message = null;
+        String senderLogin = authClients.get(client);
         if (command.getKey().equals("register_account") || command.getKey().equals("login_account")){
             if (authClients.containsKey(client)){
                 message = "[X] Ошибка: вход в аккаунт уже выполнен на этом клиенте.";
             }
             else {
-                message = CommandInvoker.executeCommand(command);
+                message = CommandInvoker.executeCommand(senderLogin, command);
                 if (message.startsWith("[:^)]")){
                     authClients.putIfAbsent(client, (String) command.getArgs()[0]);
                 }
             }
         }
         else if (authClients.containsKey(client)){
-            message = CommandInvoker.executeCommand(command);
+            message = CommandInvoker.executeCommand(senderLogin, command);
         }
         else{
             message = "Ошибка: не выполнен вход в аккаунт. Исполнение команд запрещено.";
@@ -149,38 +152,6 @@ public class Server {
             buffer.put(baos.toByteArray());
         }
         buffer.flip();
-        while (buffer.hasRemaining()){  
-            client.write(buffer);
-        }
-        buffer.clear();
-    }
-
-    @SuppressWarnings("unused")
-    @Deprecated
-    private void echo(ByteBuffer buffer, SelectionKey key) throws IOException{
-        if (!(key.channel() instanceof SocketChannel client)){
-            throw new RuntimeException("Получено сообщение по неизвестному каналу.");
-        }
-        buffer.clear();
-        int bytesRead = -1;
-        try {
-            bytesRead = client.read(buffer);
-        } catch (SocketException e) {
-            System.out.println("Разорвано соединение с клиентом (" + client.getRemoteAddress() + ").");
-            logger.warn("Разорвано соединение с клиентом (" + client.getRemoteAddress() + ").");
-            client.close();
-            return;
-        }
-        if (bytesRead == -1){
-            System.out.println("Разорвано соединение с клиентом (" + client.getRemoteAddress() + ").");
-            logger.warn("Разорвано соединение с клиентом (" + client.getRemoteAddress() + ").");
-            client.close();
-            return;
-        }
-        buffer.flip();
-        String message = new String(buffer.array(), buffer.position(), bytesRead);
-        System.out.println("Получено сообщение от клиента (" + client.getRemoteAddress() + "): " + message);
-        logger.info("Получено сообщение от клиента (" + client.getRemoteAddress() + "): " + message);
         while (buffer.hasRemaining()){  
             client.write(buffer);
         }
@@ -207,10 +178,10 @@ public class Server {
         Coordinates coordinates = new Coordinates(1L, 2D);
         Person killer = new Person("vasya", null, Color.BROWN, Country.RUSSIA, location);
         Dragon dragon = new Dragon("testupdate2", coordinates, 12, 34D, true, Color.RED, killer);
-        CollectionManager.addElement("testwithEmbed", dragon);
+        CollectionManager.insertElement("admin", "testwithEmbed", dragon);
 
-        System.out.println(CommandInvoker.executeCommand(new Request("show", null)));
-        System.out.println(killer.compareTo(null));
+        //System.out.println(CommandInvoker.executeCommand("admin", new Request("show", null)));
+        //System.out.println(killer.compareTo(null));
 
         int port = 64494;
         Server server = new Server(port);

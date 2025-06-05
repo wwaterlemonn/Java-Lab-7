@@ -2,30 +2,32 @@ package wlmn.dbeditor;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 /**
  * Класс для хранения информации о пользователях - логинов и паролей. Хранится в базе данных.
  */
 @Entity
-public class User {
+@Table(name = "user_account")
+public class UserAccount {
     @Id
     private String login;
 
-    private byte[] password;
+    private String password;
 
     public String getLogin() {
         return login;
     }
 
-    public byte[] getPassword() {
+    public String getPassword() {
         return password;
     }
 
-    public User(){
+    public UserAccount(){
 
     }
 
-    public User(String login, byte[] password){
+    public UserAccount(String login, String password){
         this.login = login;
         this.password = password;
     }

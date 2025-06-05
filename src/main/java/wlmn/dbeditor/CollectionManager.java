@@ -38,19 +38,21 @@ public class CollectionManager {
      * @param key ключ, по которому будет сохранён дракон
      * @param dragon объект дракона для добавления
      */
-    public static void addElement(String key, Dragon dragon){
+    public static String insertElement(String login, String key, Dragon dragon){
         try{
             session.beginTransaction();
             dragon.setKey(key);
+            dragon.setOwnerLogin(login);
             session.persist(dragon);
             session.getTransaction().commit();
             collection.putIfAbsent(key, dragon);
+            return ("В коллекцию успешно добавлен элемент с ключом " + key + ".");
         }
         catch(ConstraintViolationException e){
-            System.out.println(e.getClass() + ": " + e.getMessage());
             if (session.getTransaction() != null) {
                 session.getTransaction().rollback();
             }
+            return ("Ошибка: элемент с ключом " + key + " уже существует.");
         }
     }
 
@@ -61,21 +63,23 @@ public class CollectionManager {
      * @param key ключ, по которому будет сохранён дракон
      * @param dragon новый объект дракона для обновления
      */
-    public static void updateElement(long id, Dragon dragon){
+    public static String updateElement(String login, long id, Dragon dragon){
         try{
             session.beginTransaction();
             Dragon oldDragon = session.find(Dragon.class, id);
             dragon.setKey(oldDragon.getKey());
             dragon.setId(id);
+            dragon.setOwnerLogin(login);
             session.merge(dragon);
             session.getTransaction().commit();
             collection.replace(dragon.getKey(), dragon);
+            return ("Значение элемента коллекции с id = " + id + " успешно обновлено.");
         }
         catch(NullPointerException e){
-            System.out.println(e.getClass() + ": " + e.getMessage());
             if (session.getTransaction() != null) {
                 session.getTransaction().rollback();
             }
+            return ("Ошибка: не удалось обновить элемент, так как элемента с id = " + id + " не существует.");
         }
     }
 
@@ -85,10 +89,11 @@ public class CollectionManager {
      * @param key ключ элемента, который нужно удалить
      * @return удалённый объект {@link Dragon} или {@code null}, если ключ не найден
      */
-    public static Dragon removeElement(Long id){
+    public static Dragon removeElement(String login, Long id){
         try{
-            session.beginTransaction();
             Dragon dragon = session.find(Dragon.class, id);
+            if (!dragon.getOwnerLogin().equals(login)) return null;
+            session.beginTransaction();
             session.remove(dragon);
             session.getTransaction().commit();
             return collection.remove(dragon.getKey());
@@ -103,10 +108,23 @@ public class CollectionManager {
     }
 
     /**
-     * Полностью очищает коллекцию драконов.
+     * Полностью очищает коллекцию драконов соответствующего пользователя.
      */
-    public static void clearCollection(){
-        collection.clear();
+    public static void clearCollection(String login){
+        try{
+            session.beginTransaction();
+            session.createMutationQuery("DELETE FROM Dragon dragon WHERE dragon.ownerLogin = :login")
+                .setParameter("login", login)
+                .executeUpdate();
+            session.getTransaction().commit();
+            collection.entrySet().removeIf(item -> (item.getValue().getOwnerLogin().equals(login)));
+        }
+        catch(Exception e){
+            System.out.println(e.getClass() + ": " + e.getMessage());
+            if (session.getTransaction() != null) {
+                session.getTransaction().rollback();
+            }
+        }
     }
 
     /**

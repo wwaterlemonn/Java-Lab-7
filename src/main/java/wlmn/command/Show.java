@@ -11,7 +11,7 @@ import wlmn.dbeditor.FileEditor;
 /**
  * Команда, выводящая коллекцию в консоль.
  */
-public class Show implements Command{
+public class Show extends Command{
     public Show(){
 
     }

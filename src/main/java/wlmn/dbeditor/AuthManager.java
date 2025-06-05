@@ -15,7 +15,7 @@ public class AuthManager{
     public static String registerUser(String login, String password){
         try{
             session.beginTransaction();
-            User user = new User(login, md.digest(password.getBytes()));
+            UserAccount user = new UserAccount(login, bytesToHex(md.digest(password.getBytes())));
             session.persist(user);
             session.getTransaction().commit();
             return ("[:^)] Успешно зарегистрирован пользователь с логином " + login + ".");
@@ -30,14 +30,28 @@ public class AuthManager{
     }
 
     public static String authenticateUser(String login, String password){
-        User user = session.createSelectionQuery("SELECT user FROM User user WHERE login = :login", User.class)
+        UserAccount user = session.createSelectionQuery("SELECT user FROM UserAccount user WHERE login = :login", UserAccount.class)
             .setParameter("login", login).getSingleResultOrNull();
-        if (user != null && user.getPassword().equals(md.digest(password.getBytes()))){
+        System.out.println("in table: " + user.getPassword());
+        System.out.println("from client: " + password + " = " + new String(bytesToHex(md.digest(password.getBytes()))));
+        if (user != null && user.getPassword().equals(bytesToHex(md.digest(password.getBytes())))){
             return ("[:^)] Успешно выполнен вход в аккаунт с логином " + login + ".");
         }
         else{
             return ("[X] Ошибка: неверный логин или пароль.");
         }
+    }
+
+    private static String bytesToHex(byte[] hash) {
+        StringBuilder hexString = new StringBuilder(2 * hash.length);
+        for (int i = 0; i < hash.length; i++) {
+            String hex = Integer.toHexString(0xff & hash[i]);
+            if(hex.length() == 1) {
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
+        return hexString.toString();
     }
 
     public static void initMD(String algorithm) throws NoSuchAlgorithmException{

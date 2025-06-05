@@ -5,15 +5,16 @@ import wlmn.dbeditor.CollectionManager;
 /**
  * Команда, очищающая коллекцию.
  */
-public class Clear implements Command{
+public class Clear extends ModificationCommand{
+    
     public Clear(){
 
     }
     
     public String execute() {
-        CollectionManager.clearCollection();
+        CollectionManager.clearCollection(login);
 
-        return ("Коллекция полностью очищена.");
+        return ("Ваша коллекция полностью очищена.");
     }
 
     public static String getMessage(){

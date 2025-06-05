@@ -5,7 +5,7 @@ import wlmn.dbeditor.CollectionManager;
 /**
  * Команда, удаляющая все элементы коллекции с ключом больше заданного.
  */
-public class RemoveGreaterKey implements Command{
+public class RemoveGreaterKey extends ModificationCommand{
     private String key;
 
     /**
@@ -23,7 +23,7 @@ public class RemoveGreaterKey implements Command{
         CollectionManager.getCollection().keySet()
             .stream()
             .filter(item -> (item.compareTo(key) == 1))
-            .forEach(item -> CollectionManager.removeElement(CollectionManager.getCollection().get(item).getId()));
+            .forEach(item -> CollectionManager.removeElement(login, CollectionManager.getCollection().get(item).getId()));
         return ("Успешно удалены "+counter+" элементов.");
     }
 

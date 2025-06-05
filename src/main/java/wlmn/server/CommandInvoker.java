@@ -14,8 +14,17 @@ import wlmn.command.*;
  * а также ведение истории выполненных команд.
  */
 public class CommandInvoker {
+    /**
+     * {@link HashMap} для хранения в памяти последних вызванных экземпляров отдельных команд с конкретными аргументами.
+     */
     private static HashMap<String, Command> commands = new HashMap<String, Command>();
+    /**
+     * {@link HashMap} для хранения ссылок на классы команд.
+     */
     private static HashMap<String, Class<?>> commandClasses = initCommandClasses();
+    /**
+     * {@link HashMap} для хранения наборов аргументов, принимаемых командами.
+     */
     private static HashMap<String, Class<?>[]> commandSignatures = initCommandSignatures();
     private static LinkedList<String> history = new LinkedList<String>();
 
@@ -79,11 +88,12 @@ public class CommandInvoker {
      * @param args аргументы для создания команды
      * @throws IllegalArgumentException если переданные аргументы не соответствуют сигнатуре команды
      */
-    public static void updateCommand(String key, Object[] args) throws IllegalArgumentException{
+    public static void updateCommand(String login, String key, Object[] args) throws IllegalArgumentException{
         Class<?> commandClass = commandClasses.get(key);
         try{
             Constructor<?> commandConstructor = commandClass.getConstructor(commandSignatures.get(key));
             Command newCommand = (Command) commandConstructor.newInstance(args);
+            if (newCommand instanceof ModificationCommand) ((ModificationCommand) newCommand).setLogin(login);
             commands.put(key, newCommand);
         }
         catch(Exception e){
@@ -98,13 +108,14 @@ public class CommandInvoker {
      * @param commandName имя выполняемой команды
      * @param commandArgs аргументы команды
      */
-    public static String executeCommand(Request request){
+    public static String executeCommand(String login, Request request){
         try{
-            updateCommand(request.getKey(), request.getArgs());
+            updateCommand(login, request.getKey(), request.getArgs());
             updateHistory(request.getKey());
             return commands.get(request.getKey()).execute();
         }catch(IllegalArgumentException e){
-            return(e.getMessage());
+            e.printStackTrace();
+            return(e.getClass() + e.getMessage());
         }
         catch(NullPointerException e){
             e.printStackTrace();

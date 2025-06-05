@@ -12,7 +12,7 @@ import wlmn.dbeditor.FileEditor;
 /**
  * Команда, которая выводит все элементы коллекции со значением поля killer меньше указанного.
  */
-public class FilterLessThanKiller implements Command{
+public class FilterLessThanKiller extends Command{
     private Person killer;
 
     /**
