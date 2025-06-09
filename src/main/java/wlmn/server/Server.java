@@ -14,7 +14,7 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.security.NoSuchAlgorithmException;
-import java.util.LinkedHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +32,7 @@ import wlmn.myenum.Country;
 public class Server {
     final int PORT;
     private static final Logger logger = LoggerFactory.getLogger(Server.class);
-    private LinkedHashMap<SocketChannel, String> authClients = new LinkedHashMap<SocketChannel, String>();
+    private ConcurrentHashMap<SocketChannel, String> authClients = new ConcurrentHashMap<SocketChannel, String>();
 
     public Server(int PORT) {
         this.PORT = PORT;
@@ -107,45 +107,53 @@ public class Server {
             client.close();
             return;
         }
-
         buffer.flip();
-        Request command = null;
+        Request request = null;
         try (ByteArrayInputStream bais = new ByteArrayInputStream(buffer.array());
         ObjectInputStream ois = new ObjectInputStream(bais)){
-            command = (Request) ois.readObject();
+            request = (Request) ois.readObject();
         }
         catch (ClassNotFoundException e){
             logger.error("Ошибка: не удалось прочитать запрос от клиента.");
             System.out.println("Ошибка: не удалось прочитать запрос от клиента.");
         }
-        System.out.println("|R| Получен запрос на выполнение команды /" + command.getKey() + " от клиента (" + client.getRemoteAddress() + ").");
-        logger.info("|R| Получен запрос на выполнение команды /" + command.getKey() + " от клиента (" + client.getRemoteAddress() + ").");
+        System.out.println("|R| Получен запрос на выполнение команды /" + request.getKey() + " от клиента (" + client.getRemoteAddress() + ").");
+        logger.info("|R| Получен запрос на выполнение команды /" + request.getKey() + " от клиента (" + client.getRemoteAddress() + ").");
         buffer.clear();
 
+        digest(client, request, buffer.duplicate());
+    }
+
+    private void digest(SocketChannel client, Request request, ByteBuffer buffer) throws IOException{
         String message = null;
         String senderLogin = authClients.get(client);
-        if (command.getKey().equals("register_account") || command.getKey().equals("login_account")){
+        if (request.getKey().equals("register_account") || request.getKey().equals("login_account")){
             if (authClients.containsKey(client)){
                 message = "[X] Ошибка: вход в аккаунт уже выполнен на этом клиенте.";
             }
             else {
-                message = CommandInvoker.executeCommand(senderLogin, command);
+                message = CommandInvoker.executeCommand(senderLogin, request);
                 if (message.startsWith("[:^)]")){
-                    authClients.putIfAbsent(client, (String) command.getArgs()[0]);
+                    authClients.putIfAbsent(client, (String) request.getArgs()[0]);
                 }
             }
         }
         else if (authClients.containsKey(client)){
-            message = CommandInvoker.executeCommand(senderLogin, command);
+            message = CommandInvoker.executeCommand(senderLogin, request);
         }
         else{
             message = "Ошибка: не выполнен вход в аккаунт. Исполнение команд запрещено.";
         }
 
-        String response = "Результат выполнения команды /"+ command.getKey() + ", запрошенной клиентом ("
+        String response = "Результат выполнения команды /"+ request.getKey() + ", запрошенной клиентом ("
         + client.getRemoteAddress() + "): \n-----\n" + message + "\n-----";
         logger.info(response);
         System.out.println(response);
+
+        send(client, response, buffer.duplicate());
+    }
+
+    private void send(SocketChannel client, String response, ByteBuffer buffer) throws IOException{
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ObjectOutputStream oos = new ObjectOutputStream(baos)){
             oos.writeObject(response);
