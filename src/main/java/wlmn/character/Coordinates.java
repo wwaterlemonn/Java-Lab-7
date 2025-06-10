@@ -1,4 +1,4 @@
-package wlmn.location;
+package wlmn.character;
 
 import java.io.Serializable;
 
@@ -62,8 +62,8 @@ public class Coordinates implements Serializable, Comparable<Coordinates>{
         return y;
     }
 
-     @Override
-     public int compareTo(Coordinates o) {
+    @Override
+    public int compareTo(Coordinates o) {
         if (Math.sqrt(this.x*this.x + this.y*this.y) > (Math.sqrt(o.x*o.x + o.y*o.y))){
             return 1;
         }
@@ -73,5 +73,10 @@ public class Coordinates implements Serializable, Comparable<Coordinates>{
         else{
             return -1;
         }
-     }
+    }
+
+    @Override
+    public String toString() {
+        return ("X: " + x + ", Y: " + y);
+    }
 }

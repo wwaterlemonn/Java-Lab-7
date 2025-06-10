@@ -2,6 +2,7 @@ package wlmn.character;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;
+import java.util.Objects;
 
 import org.hibernate.annotations.EmbeddedColumnNaming;
 
@@ -17,8 +18,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
-import wlmn.location.Coordinates;
-import wlmn.myenum.Color;
 
 /**
  * Класс, представляющий дракона.
@@ -297,9 +296,9 @@ public class Dragon implements Comparable<Dragon>, Serializable{
 
     @Override
     public String toString() {
-        return "Dragon [id=" + id + ", name=" + name + ", coordinates=" + coordinates + ", creationDate=" + creationDate
-                + ", age=" + age + ", weight=" + weight + ", speaking=" + speaking + ", color=" + color + ", killer="
-                + killer + "]";
+        return (key + " | ID: " + id + " | OWNER: " + ownerLogin + "\n  Name: " + name + "\n  Coordinates: " 
+            + Objects.toString(coordinates, "NULL") + "\n  Creation Date: " + creationDate 
+            + "\n  Age: " + age + "\n  Weight: " + weight + "\n  Speaking: " + speaking 
+            + "\n  Color: " + color.name() + "\n  Killer:\n" + Objects.toString(killer, "    NULL"));
     }
-    
 }

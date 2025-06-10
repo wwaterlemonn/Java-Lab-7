@@ -12,9 +12,6 @@ import jakarta.persistence.Embeddable;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import wlmn.location.Location;
-import wlmn.myenum.Color;
-import wlmn.myenum.Country;
 
 /**
  * Класс, представляющий человека (в рамках приложения - убийцу дракона).
@@ -138,5 +135,11 @@ public class Person implements Comparable<Person>, Serializable{
      */
     public Location getLocation() {
         return location;
+    }
+
+    @Override
+    public String toString() {
+        return ("    Name: " + name + "\n    Birthday: " + birthday + "\n    Hair Color: " + hairColor.name() + "\n    Nationality: "
+            + nationality.name() + "\n    Location: " + location.toString());
     }
 }

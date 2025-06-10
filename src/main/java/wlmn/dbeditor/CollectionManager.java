@@ -1,6 +1,7 @@
 package wlmn.dbeditor;
 
 import java.util.TreeMap;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 import org.hibernate.Session;
@@ -16,6 +17,7 @@ public class CollectionManager {
     private static TreeMap<String, Dragon> collection;
     private static String collectionFileName;
     private static Session session = HibernateUtil.getSessionFactory().openSession();
+    private static ReentrantLock lock = new ReentrantLock();
 
     /**
      * Загружает коллекцию драконов из JSON-файла.
@@ -39,6 +41,7 @@ public class CollectionManager {
      * @param dragon объект дракона для добавления
      */
     public static String insertElement(String login, String key, Dragon dragon){
+        lock.lock();
         try{
             session.beginTransaction();
             dragon.setKey(key);
@@ -46,12 +49,14 @@ public class CollectionManager {
             session.persist(dragon);
             session.getTransaction().commit();
             collection.putIfAbsent(key, dragon);
+            lock.unlock();
             return ("В коллекцию успешно добавлен элемент с ключом " + key + ".");
         }
         catch(ConstraintViolationException e){
             if (session.getTransaction() != null) {
                 session.getTransaction().rollback();
             }
+            lock.unlock();
             return ("Ошибка: элемент с ключом " + key + " уже существует.");
         }
     }
@@ -64,6 +69,7 @@ public class CollectionManager {
      * @param dragon новый объект дракона для обновления
      */
     public static String updateElement(String login, long id, Dragon dragon){
+        lock.lock();
         try{
             session.beginTransaction();
             Dragon oldDragon = session.find(Dragon.class, id);
@@ -73,12 +79,14 @@ public class CollectionManager {
             session.merge(dragon);
             session.getTransaction().commit();
             collection.replace(dragon.getKey(), dragon);
+            lock.unlock();
             return ("Значение элемента коллекции с id = " + id + " успешно обновлено.");
         }
         catch(NullPointerException e){
             if (session.getTransaction() != null) {
                 session.getTransaction().rollback();
             }
+            lock.unlock();
             return ("Ошибка: не удалось обновить элемент, так как элемента с id = " + id + " не существует.");
         }
     }
@@ -90,12 +98,14 @@ public class CollectionManager {
      * @return удалённый объект {@link Dragon} или {@code null}, если ключ не найден
      */
     public static Dragon removeElement(String login, Long id){
+        lock.lock();
         try{
             Dragon dragon = session.find(Dragon.class, id);
             if (!dragon.getOwnerLogin().equals(login)) return null;
             session.beginTransaction();
             session.remove(dragon);
             session.getTransaction().commit();
+            lock.unlock();
             return collection.remove(dragon.getKey());
         }
         catch(IllegalArgumentException e){
@@ -103,6 +113,7 @@ public class CollectionManager {
             if (session.getTransaction() != null) {
                 session.getTransaction().rollback();
             }
+            lock.unlock();
             return null;
         }
     }
@@ -111,6 +122,7 @@ public class CollectionManager {
      * Полностью очищает коллекцию драконов соответствующего пользователя.
      */
     public static void clearCollection(String login){
+        lock.lock();
         try{
             session.beginTransaction();
             session.createMutationQuery("DELETE FROM Dragon dragon WHERE dragon.ownerLogin = :login")
@@ -118,12 +130,14 @@ public class CollectionManager {
                 .executeUpdate();
             session.getTransaction().commit();
             collection.entrySet().removeIf(item -> (item.getValue().getOwnerLogin().equals(login)));
+            lock.unlock();
         }
         catch(Exception e){
             System.out.println(e.getClass() + ": " + e.getMessage());
             if (session.getTransaction() != null) {
                 session.getTransaction().rollback();
             }
+            lock.unlock();
         }
     }
 

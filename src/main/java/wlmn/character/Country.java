@@ -1,4 +1,4 @@
-package wlmn.myenum;
+package wlmn.character;
 
 /**
  * Перечисление различных стран.

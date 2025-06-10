@@ -15,24 +15,33 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import wlmn.character.Color;
+import wlmn.character.Coordinates;
+import wlmn.character.Country;
 import wlmn.character.Dragon;
+import wlmn.character.Location;
 import wlmn.character.Person;
 import wlmn.command.Request;
 import wlmn.dbeditor.AuthManager;
 import wlmn.dbeditor.CollectionManager;
-import wlmn.location.Coordinates;
-import wlmn.location.Location;
-import wlmn.myenum.Color;
-import wlmn.myenum.Country;
 
 public class Server {
     final int PORT;
     private static final Logger logger = LoggerFactory.getLogger(Server.class);
     private ConcurrentHashMap<SocketChannel, String> authClients = new ConcurrentHashMap<SocketChannel, String>();
+    private ConcurrentLinkedDeque<SelectionKey> usedKeys = new ConcurrentLinkedDeque<SelectionKey>();
+
+    private ExecutorService readPool = Executors.newCachedThreadPool();
+    private ForkJoinPool digestPool = new ForkJoinPool();
+    private ForkJoinPool sendPool = new ForkJoinPool();
 
     public Server(int PORT) {
         this.PORT = PORT;
@@ -51,11 +60,18 @@ public class Server {
                     continue;
                 }
                 for (SelectionKey key: selector.selectedKeys()){
-                    if (key.isAcceptable()){
+                    if (key.isValid() && key.isAcceptable()){
                         connectClient(selector, key);
                     }
-                    if (key.isReadable()){
-                        receiveThenSend(buffer, key);
+                    if (key.isValid() && key.isReadable() && !usedKeys.contains(key)){
+                        readPool.submit(() -> {
+                            try {
+                                receiveThenSend(buffer, key);
+                            } catch (IOException e) {
+                                System.out.println(getClass() + " " + e.getMessage());
+                            }
+                        });
+                        usedKeys.push(key);
                     }
                 }
                 selector.selectedKeys().clear();
@@ -65,7 +81,8 @@ public class Server {
             logger.error("Ошибка: Версия класса, полученного от клиента, не совпадает с версией на сервере.");
         } catch(IOException e){
             //throw new RuntimeException(e.getMessage());
-            e.printStackTrace();
+            //e.printStackTrace();
+            System.out.println(getClass() + " " + e.getMessage());
         }
     }
 
@@ -121,7 +138,18 @@ public class Server {
         logger.info("|R| Получен запрос на выполнение команды /" + request.getKey() + " от клиента (" + client.getRemoteAddress() + ").");
         buffer.clear();
 
-        digest(client, request, buffer.duplicate());
+        Request requestArg = request; //в лямбда выражении требуется переменная effectively final (???)
+
+        usedKeys.remove(key);
+
+        digestPool.execute(() -> {
+            try {
+                digest(client, requestArg, buffer.duplicate());
+            } catch (IOException e) {
+                System.out.println(e.getClass() + " " + e.getMessage());
+            }
+        });
+        //digest(client, requestArg, buffer.duplicate());
     }
 
     private void digest(SocketChannel client, Request request, ByteBuffer buffer) throws IOException{
@@ -150,7 +178,14 @@ public class Server {
         logger.info(response);
         System.out.println(response);
 
-        send(client, response, buffer.duplicate());
+        sendPool.execute(() -> {
+            try {
+                send(client, response, buffer.duplicate());
+            } catch (IOException e) {
+                System.out.println(e.getClass() + " " + e.getMessage());
+            }
+        });
+        //send(client, response, buffer.duplicate());
     }
 
     private void send(SocketChannel client, String response, ByteBuffer buffer) throws IOException{

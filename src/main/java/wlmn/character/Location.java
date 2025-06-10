@@ -1,4 +1,4 @@
-package wlmn.location;
+package wlmn.character;
 
 import java.io.Serializable;
 
@@ -75,5 +75,10 @@ public class Location implements Serializable{
      */
     public double getZ() {
         return z;
+    }
+
+    @Override
+    public String toString() {
+        return ("X: " + x + ", Y: " + y + ", Z: " + z);
     }
 }

@@ -2,6 +2,8 @@ package wlmn.dbeditor;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.concurrent.locks.ReentrantLock;
+
 import org.hibernate.Session;
 import org.hibernate.exception.ConstraintViolationException;
 
@@ -11,8 +13,10 @@ import org.hibernate.exception.ConstraintViolationException;
 public class AuthManager{
     private static MessageDigest md;
     private static Session session = HibernateUtil.getSessionFactory().openSession();
+    private static ReentrantLock lock = new ReentrantLock();
 
     public static String registerUser(String login, String password){
+        lock.lock();
         try{
             session.beginTransaction();
             UserAccount user = new UserAccount(login, bytesToHex(md.digest(password.getBytes())));
@@ -27,17 +31,21 @@ public class AuthManager{
             }
             return ("[X] Ошибка: пользователь с логином " + login + " уже существует.");
         }
+        finally{
+            lock.unlock();
+        }
     }
 
     public static String authenticateUser(String login, String password){
+        lock.lock();
         UserAccount user = session.createSelectionQuery("SELECT user FROM UserAccount user WHERE login = :login", UserAccount.class)
             .setParameter("login", login).getSingleResultOrNull();
-        System.out.println("in table: " + user.getPassword());
-        System.out.println("from client: " + password + " = " + new String(bytesToHex(md.digest(password.getBytes()))));
         if (user != null && user.getPassword().equals(bytesToHex(md.digest(password.getBytes())))){
+            lock.unlock();
             return ("[:^)] Успешно выполнен вход в аккаунт с логином " + login + ".");
         }
         else{
+            lock.unlock();
             return ("[X] Ошибка: неверный логин или пароль.");
         }
     }
