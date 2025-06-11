@@ -64,6 +64,7 @@ public class Server {
                         connectClient(selector, key);
                     }
                     if (key.isValid() && key.isReadable() && !usedKeys.contains(key)){
+                        usedKeys.push(key);
                         readPool.submit(() -> {
                             try {
                                 receiveThenSend(buffer, key);
@@ -71,7 +72,6 @@ public class Server {
                                 System.out.println(getClass() + " " + e.getMessage());
                             }
                         });
-                        usedKeys.push(key);
                     }
                 }
                 selector.selectedKeys().clear();
@@ -149,7 +149,6 @@ public class Server {
                 System.out.println(e.getClass() + " " + e.getMessage());
             }
         });
-        //digest(client, requestArg, buffer.duplicate());
     }
 
     private void digest(SocketChannel client, Request request, ByteBuffer buffer) throws IOException{
@@ -185,7 +184,6 @@ public class Server {
                 System.out.println(e.getClass() + " " + e.getMessage());
             }
         });
-        //send(client, response, buffer.duplicate());
     }
 
     private void send(SocketChannel client, String response, ByteBuffer buffer) throws IOException{
@@ -220,8 +218,8 @@ public class Server {
         Location location = new Location(1L, 2L, 3D);
         Coordinates coordinates = new Coordinates(1L, 2D);
         Person killer = new Person("vasya", null, Color.BROWN, Country.RUSSIA, location);
-        Dragon dragon = new Dragon("testupdate2", coordinates, 12, 34D, true, Color.RED, killer);
-        CollectionManager.insertElement("admin", "testwithEmbed", dragon);
+        Dragon dragon = new Dragon("testupdate2", coordinates, 12, 34D, true, Color.RED, null);
+        System.out.println(CollectionManager.insertElement("admin", "testwithEmbed", dragon));
 
         //System.out.println(CommandInvoker.executeCommand("admin", new Request("show", null)));
         //System.out.println(killer.compareTo(null));

@@ -18,6 +18,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 /**
  * Класс, представляющий дракона.
@@ -53,6 +56,8 @@ public class Dragon implements Comparable<Dragon>, Serializable{
      * Имя дракона.
      * Не может быть null или пустой строкой.
      */
+    @NotNull
+    @Size(min = 1, message = "Имя не может быть пустой строкой.")
     private String name;
 
     /**
@@ -61,24 +66,29 @@ public class Dragon implements Comparable<Dragon>, Serializable{
      */
     @Embedded
     @EmbeddedColumnNaming("%s")
+    @NotNull(message = "Координаты не могут быть null.")
     private Coordinates coordinates;
 
     /**
      * Дата создания записи о драконе.
      * Не может быть null, генерируется автоматически.
      */
+    @NotNull(message = "Дата создания не может быть null.")
     private ZonedDateTime creationDate;
 
     /**
      * Возраст дракона.
      * Должен быть > 0.
      */
+    @Min(value = 0, message = "Возраст должен быть > 0.")
     private int age;
 
     /**
      * Вес дракона.
      * Не может быть null, должен быть > 0.
      */
+    @NotNull(message = "Вес не может быть null.")
+    @Min(value = 0, message = "Вес должен быть > 0.")
     private Double weight;
 
     /**
@@ -101,6 +111,9 @@ public class Dragon implements Comparable<Dragon>, Serializable{
     @EmbeddedColumnNaming("killer_%s")
     private Person killer;
 
+    /**
+     * Пустой конструктор для Hibernate.
+     */
     public Dragon(){
 
     }

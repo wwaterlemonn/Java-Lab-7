@@ -1,5 +1,6 @@
 package wlmn.dbeditor;
 
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
@@ -7,6 +8,10 @@ import java.util.stream.Collectors;
 import org.hibernate.Session;
 import org.hibernate.exception.ConstraintViolationException;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import wlmn.character.Dragon;
 
 /**
@@ -17,6 +22,10 @@ public class CollectionManager {
     private static TreeMap<String, Dragon> collection;
     private static String collectionFileName;
     private static Session session = HibernateUtil.getSessionFactory().openSession();
+
+    private static ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
+    private static Validator validator = validatorFactory.getValidator();
+
     private static ReentrantLock lock = new ReentrantLock();
 
     /**
@@ -32,6 +41,15 @@ public class CollectionManager {
             .collect(Collectors.toMap(Dragon::getKey, item -> item, (e1, e2) -> e1, TreeMap::new));
         System.out.println("Коллекция загружена из базы данных.");
     }
+
+    private static String validateElement(Dragon dragon){
+        Set<ConstraintViolation<Dragon>> constraintViolations = validator.validate(dragon);
+        if (constraintViolations.isEmpty()) return null;
+        return "Ошибка: были выявлены следующие нарушения ограничений на поля элемента:\n  -"
+            + constraintViolations.stream()
+            .map(violation -> violation.getMessage())
+            .collect(Collectors.joining("\n  -"));
+    }
     
     /**
      * Добавляет новый элемент в коллекцию с заданным ключом, при условии что элемента с таким ключом
@@ -43,9 +61,12 @@ public class CollectionManager {
     public static String insertElement(String login, String key, Dragon dragon){
         lock.lock();
         try{
-            session.beginTransaction();
             dragon.setKey(key);
             dragon.setOwnerLogin(login);
+            String violations = validateElement(dragon);
+            if (violations != null) return violations;
+            System.out.println("No violations");
+            session.beginTransaction();
             session.persist(dragon);
             session.getTransaction().commit();
             collection.putIfAbsent(key, dragon);
@@ -71,6 +92,8 @@ public class CollectionManager {
     public static String updateElement(String login, long id, Dragon dragon){
         lock.lock();
         try{
+            String violations = validateElement(dragon);
+            if (violations != null) return violations;
             session.beginTransaction();
             Dragon oldDragon = session.find(Dragon.class, id);
             dragon.setKey(oldDragon.getKey());

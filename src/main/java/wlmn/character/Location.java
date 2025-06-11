@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Embeddable;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * Класс, представляющий трехмерные координаты в пространстве.
@@ -16,12 +17,14 @@ public class Location implements Serializable{
      * Координата X.
      * Не может быть null.
      */
+    @NotNull(message = "Координата X местоположения в пространстве не может быть null.")
     private Long x;
 
     /**
      * Координата Y.
      * Не может быть null.
      */
+    @NotNull(message = "Координата Y местоположения в пространстве не может быть null.")
     private Long y;
 
     /**
@@ -30,6 +33,9 @@ public class Location implements Serializable{
      */
     private double z;
 
+    /**
+     * Пустой конструктор для Hibernate.
+     */
     public Location(){
 
     }

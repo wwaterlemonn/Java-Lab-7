@@ -100,6 +100,25 @@
         <artifactId>postgresql</artifactId>
         <version>42.7.6</version>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator -->
+  <dependency>
+      <groupId>org.hibernate.validator</groupId>
+      <artifactId>hibernate-validator</artifactId>
+      <version>9.0.0.Final</version>
+  </dependency>
+    <!-- https://mvnrepository.com/artifact/org.glassfish/jakarta.el -->
+    <dependency>
+        <groupId>org.glassfish</groupId>
+        <artifactId>jakarta.el</artifactId>
+        <version>5.0.0-M1</version>
+        <scope>compile</scope>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator-cdi -->
+    <dependency>
+        <groupId>org.hibernate.validator</groupId>
+        <artifactId>hibernate-validator-cdi</artifactId>
+        <version>9.0.0.Final</version>
+    </dependency>
   </dependencies>
 
   <build>

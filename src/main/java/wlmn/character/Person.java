@@ -12,6 +12,8 @@ import jakarta.persistence.Embeddable;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 /**
  * Класс, представляющий человека (в рамках приложения - убийцу дракона).
@@ -24,6 +26,8 @@ public class Person implements Comparable<Person>, Serializable{
      * Имя человека.
      * Не может быть null или пустой строкой.
      */
+    @NotNull(message = "Имя человека не может быть null.")
+    @Size(min = 1, message = "Имя человека не может быть пустым.")
     private String name;
 
     /**
@@ -43,6 +47,7 @@ public class Person implements Comparable<Person>, Serializable{
      * Национальность человека.
      * Не может быть null.
      */
+    @NotNull(message = "Национальность человека не может быть null.")
     @Enumerated(EnumType.STRING)
     private Country nationality;
 
@@ -52,8 +57,12 @@ public class Person implements Comparable<Person>, Serializable{
      */
     @Embedded
     @EmbeddedColumnNaming("%s")
+    @NotNull(message = "Местоположение человека не может быть null.")
     private Location location;
 
+    /**
+     * Пустой конструктор для Hibernate.
+     */
     public Person(){
         
     }

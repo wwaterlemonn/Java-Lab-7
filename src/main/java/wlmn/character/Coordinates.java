@@ -6,6 +6,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Embeddable;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * Класс, представляющий координаты на плоскости.
@@ -16,14 +19,17 @@ public class Coordinates implements Serializable, Comparable<Coordinates>{
      * Координата X.
      * Значение должно быть > -240.
      */
+    @NotNull(message = "Координата X координат на плоскости не может быть null.")
+    @Min(value = -240, message = "Координата X координат на плоскости должна быть > -240.")
     private long x;
 
     /**
      * Координата Y.
      * Не может быть null, должно быть <= 929.
      */
+    @NotNull(message = "Координата Y координат на плоскости не может быть null.")
+    @Max(value = 929, message = "Координата Y координат на плоскости должна быть <= 929.")
     private Double y;
-
 
     public Coordinates(){
 
