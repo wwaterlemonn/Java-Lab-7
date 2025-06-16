@@ -36,7 +36,14 @@ import wlmn.dbeditor.CollectionManager;
 public class Server {
     final int PORT;
     private static final Logger logger = LoggerFactory.getLogger(Server.class);
+    /**
+     * {@link ConcurrentHashMap} для хранения активных авторизованных клиентов с их логинами.
+     */
     private ConcurrentHashMap<SocketChannel, String> authClients = new ConcurrentHashMap<SocketChannel, String>();
+    /**
+     * {@link ConcurrentLinkedDeque} для временного хранения ключей {@link SelectionKey} на время их прочтения.
+     * Используется для предотвращения одновременного прочтения одного и того же ключа несколькими потоками.
+     */
     private ConcurrentLinkedDeque<SelectionKey> usedKeys = new ConcurrentLinkedDeque<SelectionKey>();
 
     private ExecutorService readPool = Executors.newCachedThreadPool();
@@ -177,7 +184,7 @@ public class Server {
         logger.info(response);
         System.out.println(response);
 
-        sendPool.execute(() -> {
+        Thread.ofVirtual().start(() -> {
             try {
                 send(client, response, buffer.duplicate());
             } catch (IOException e) {
@@ -215,16 +222,16 @@ public class Server {
             System.exit(-1);
         }
 
-        Location location = new Location(1L, 2L, 3D);
-        Coordinates coordinates = new Coordinates(1L, 2D);
-        Person killer = new Person("vasya", null, Color.BROWN, Country.RUSSIA, location);
-        Dragon dragon = new Dragon("testupdate2", coordinates, 12, 34D, true, Color.RED, null);
-        System.out.println(CollectionManager.insertElement("admin", "testwithEmbed", dragon));
+        // Location location = new Location(1L, 2L, 3D);
+        // Coordinates coordinates = new Coordinates(1L, 2D);
+        // Person killer = new Person("vasya", null, Color.BROWN, Country.RUSSIA, location);
+        // Dragon dragon = new Dragon("testupdate2", coordinates, 12, 34D, true, Color.RED, null);
+        // System.out.println(CollectionManager.insertElement("admin", "testwithEmbed", dragon));
 
         //System.out.println(CommandInvoker.executeCommand("admin", new Request("show", null)));
         //System.out.println(killer.compareTo(null));
 
-        int port = 64494;
+        int port = 63111;
         Server server = new Server(port);
         System.out.println("Сервер запущен на порте " + port + ".");
         logger.info("Сервер запущен на порте " + port + ".");

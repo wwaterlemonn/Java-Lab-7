@@ -65,7 +65,6 @@ public class CollectionManager {
             dragon.setOwnerLogin(login);
             String violations = validateElement(dragon);
             if (violations != null) return violations;
-            System.out.println("No violations");
             session.beginTransaction();
             session.persist(dragon);
             session.getTransaction().commit();

@@ -22,21 +22,7 @@ public class Info extends Command{
     }
 
     public String execute(){
-        TreeMap<String, Dragon> collection = CollectionManager.getCollection();
-        String message = ("Тип коллекции: Dragon.");
-        File file = new File(filename);
-        Path filepath = file.toPath();
-        BasicFileAttributes attr;
-        try {
-            attr = Files.readAttributes(filepath, BasicFileAttributes.class);
-            message += ("\nДата создания: " + attr.creationTime());
-            message += ("\nДата последнего получения доступа к коллекции: " + attr.lastAccessTime());
-            message += ("\nДата последнего изменения коллекции: " + attr.lastModifiedTime());
-        } catch (IOException e) {
-            return ("Ошибка: непредвиденная ошибка при получении информации о файле коллекции.");
-        }
-        message += ("\nКоличество элементов в коллекции: "+collection.size()+".");
-        return message;
+        return "Имя базы данных: studs\nТип базы данных: PostgreSQL\nИмя таблицы: DRAGON";
     }
 
     public static String getMessage(){

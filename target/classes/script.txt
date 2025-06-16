@@ -1,0 +1,12 @@
+help execute_script
+insert scriptTest
+Scripter
+36
+49
+1007
+1200.57
+true
+Red
+false
+show
+execute_script D:\Prog\Java\Lab5-Java\src\main\resources\script.txt

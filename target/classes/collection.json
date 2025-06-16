@@ -1,0 +1,82 @@
+{
+  "1" : {
+    "id" : 1,
+    "name" : "test",
+    "coordinates" : {
+      "x" : 9,
+      "y" : 1.0
+    },
+    "creationDate" : "2025-04-07T19:41:37.9676938Z",
+    "age" : 3,
+    "weight" : 34.0,
+    "speaking" : false,
+    "color" : "RED",
+    "killer" : null
+  },
+  "scriptTest" : {
+    "id" : 2,
+    "name" : "Scripter",
+    "coordinates" : {
+      "x" : 36,
+      "y" : 49.0
+    },
+    "creationDate" : "2025-05-19T18:24:08.420967Z",
+    "age" : 1007,
+    "weight" : 1200.57,
+    "speaking" : true,
+    "color" : "RED",
+    "killer" : null
+  },
+  "scripted" : {
+    "id" : 3,
+    "name" : "Scripter",
+    "coordinates" : {
+      "x" : 36,
+      "y" : 49.0
+    },
+    "creationDate" : "2025-04-08T15:58:20.1041737Z",
+    "age" : 1007,
+    "weight" : 1200.57,
+    "speaking" : true,
+    "color" : "RED",
+    "killer" : null
+  },
+  "test2" : {
+    "id" : 4,
+    "name" : "Tester2",
+    "coordinates" : {
+      "x" : -230,
+      "y" : 929.0
+    },
+    "creationDate" : "2025-04-08T16:02:10.2569424Z",
+    "age" : 2000,
+    "weight" : 4567.89,
+    "speaking" : true,
+    "color" : "WHITE",
+    "killer" : {
+      "name" : "Добрыня Никитич",
+      "birthday" : "1008-11-11T01:02:03",
+      "hairColor" : "BROWN",
+      "nationality" : "RUSSIA",
+      "location" : {
+        "x" : 45,
+        "y" : 56,
+        "z" : 67.0
+      }
+    }
+  },
+  "testid" : {
+    "id" : 5,
+    "name" : "testid",
+    "coordinates" : {
+      "x" : 3,
+      "y" : 4.0
+    },
+    "creationDate" : "2025-05-20T11:15:00.1745484Z",
+    "age" : 5,
+    "weight" : 6.0,
+    "speaking" : true,
+    "color" : "BLACK",
+    "killer" : null
+  }
+}
